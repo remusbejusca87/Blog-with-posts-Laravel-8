@@ -8,6 +8,8 @@ use App\Models\Category;
 use App\Models\User;
 use App\Models\Post;
 
+use Illuminate\Support\Facades\Schema;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -18,21 +20,30 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // truncate stops the duplication of the models:
+
+        // running seeds with truncate() will trigger a constraint violation if foreign key checks is not disabled.
+        // so first, before truncate must disable foreign key and after truncat must enable back the foreign key, else
+        // we will have an error like this: "Syntax error or access violation: 1701 Cannot truncate a table referenced in a foreign key constraint..."
+        Schema::disableForeignKeyConstraints();
         User::truncate();
         Category::truncate();
         Post::truncate();
+        Schema::enableForeignKeyConstraints();
 
-        // this is for creating seeds with factory method-more efficient (just creatin a post with factory,
+        // this is for creating seeds with factory method-more efficient (just creating a post with factory,
         // will automatically create a user and a category too):
 
         $user = User::factory()->create([
-            'name' => 'John Doe'
+            'name' => 'Admin Joe',
+            'username' => 'AdminJoe',
+            'email' => 'admin.joe@gmail.com',
+            'password' => 'password'
         ]);
 
-        Post::factory(30)->create([
+        Post::factory(15)->create([
             'user_id' => $user->id
-        ]); 
-        
+        ]);
+
 
 
         // // this is for hardcoding seed:
